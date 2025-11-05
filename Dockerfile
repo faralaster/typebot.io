@@ -15,7 +15,7 @@ RUN npm install -g bun
 RUN bun install
 
 # Builda todos os pacotes
-RUN bun run build --filter=builder --no-cache
+RUN npx turbo run build --filter=builder --no-cache
 
 # Etapa 2: Build do builder (Next.js)
 WORKDIR /app/apps/builder
