@@ -1,18 +1,23 @@
-# Usa imagem oficial do Bun para evitar falhas de instalação
-FROM oven/bun:1.1.20
-
-# Define diretório de trabalho
+# Etapa 1: Build com Node
+FROM node:20 AS builder
 WORKDIR /app
 
-# Copia todos os arquivos para dentro da imagem
+# Copia o código
 COPY . .
 
-# 🧠 Instala dependências de build necessárias para "isolated-vm"
-RUN apt-get update && apt-get install -y python3 make g++ && ln -sf python3 /usr/bin/python
+# Instala Python e ferramentas (por segurança)
+RUN apt-get update && apt-get install -y python3 make g++
 
-# Instala dependências e constrói o projeto
-RUN bun install
-RUN bun run --filter=builder build
+# Instala dependências e faz o build
+RUN npm install -g bun && bun install && bun run --filter=builder build
 
-# Comando padrão ao iniciar o container
+
+# Etapa 2: Execução com Bun
+FROM oven/bun:1
+WORKDIR /app
+
+# Copia tudo do builder
+COPY --from=builder /app /app
+
+# Comando de inicialização
 CMD ["bun", "run", "--filter=builder", "start"]
