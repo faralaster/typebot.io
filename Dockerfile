@@ -5,17 +5,17 @@ WORKDIR /app
 # Copia todos os arquivos
 COPY . .
 
-# Dependências necessárias para o node-gyp / prisma etc
+# Dependências básicas
 RUN apt-get update && apt-get install -y python3 make g++
 
 # Instala bun
 RUN npm install -g bun
 
-# Instala todas as dependências do monorepo
+# Instala dependências do monorepo
 RUN bun install
 
-# Builda todos os pacotes (garante que @typebot.io/env e outros sejam gerados)
-RUN bun run build --filter=... --no-cache
+# Builda todos os pacotes
+RUN bun run build --no-cache
 
 # Etapa 2: Build do builder (Next.js)
 WORKDIR /app/apps/builder
