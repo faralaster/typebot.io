@@ -2,22 +2,27 @@
 FROM node:20 AS builder
 WORKDIR /app
 
-# Copia o código
+# Copia os arquivos
 COPY . .
 
-# Instala Python e ferramentas (por segurança)
+# Instala dependências do sistema
 RUN apt-get update && apt-get install -y python3 make g++
 
-# Instala dependências e faz o build
-RUN npm install -g bun && bun install && bun run --filter=builder build
+# Instala bun
+RUN npm install -g bun
+
+# Vai até o app builder e roda o build
+WORKDIR /app/apps/builder
+RUN bun install
+RUN bun run build
 
 
 # Etapa 2: Execução com Bun
 FROM oven/bun:1
 WORKDIR /app
 
-# Copia tudo do builder
+# Copia os arquivos gerados
 COPY --from=builder /app /app
 
-# Comando de inicialização
-CMD ["bun", "run", "--filter=builder", "start"]
+WORKDIR /app/apps/builder
+CMD ["bun", "run", "start"]
