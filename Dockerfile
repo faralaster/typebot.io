@@ -7,6 +7,9 @@ WORKDIR /app
 # Copia todos os arquivos para dentro da imagem
 COPY . .
 
+# 🧠 Instala dependências de build necessárias para "isolated-vm"
+RUN apt-get update && apt-get install -y python3 make g++ && ln -sf python3 /usr/bin/python
+
 # Instala dependências e constrói o projeto
 RUN bun install
 RUN bun run --filter=builder build
